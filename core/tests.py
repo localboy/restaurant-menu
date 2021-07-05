@@ -119,3 +119,18 @@ class MyLunchAPITEST(MyLunchTestCase):
         response = self.client.get(get_api_url('restaurants/todays-menu'))
         self.assertSuccess(response)
         self.assertEqual(len(response.data), 2)
+
+
+    def test_menu_votting(self):
+        menu_id = self.menu1.id
+        old_vote = self.menu1.votes
+        votting = self.client.post(get_api_url('restaurants/{}/vote'.format(menu_id)))
+        update_menu = Menu.objects.get(id=menu_id)
+
+        self.assertSuccess(votting)
+        self.assertEqual(old_vote+1, update_menu.votes)
+
+        # Again trying to vote for the same menu
+        again_votting = self.client.post(get_api_url('restaurants/{}/vote'.format(menu_id)))
+        self.assertBadRequest(again_votting)
+
