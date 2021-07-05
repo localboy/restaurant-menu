@@ -3,7 +3,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from .models import Restaurant, Employee
+from .models import Restaurant, Employee, Menu
 
 
 class UserBasicSerializer(serializers.ModelSerializer):
@@ -70,3 +70,11 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
                     designation=validated_data['designation']
                     )
             return employee
+
+
+class MenuSerializer(serializers.ModelSerializer):
+    restaurant = RestaurantSerializer()
+
+    class Meta:
+        model = Menu
+        exclude = ('votes', )

@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import generics, permissions, views, response, status
 
 from .models import Restaurant, Menu, Employee
-from .serializers import RestaurantSerializer, EmployeeSerializer, EmployeeWriteSerializer
+from .serializers import RestaurantSerializer, EmployeeSerializer, EmployeeWriteSerializer, MenuSerializer
 
 xlrd.xlsx.ensure_elementtree_imported(False, None)
 xlrd.xlsx.Element_has_iter = True
@@ -65,3 +65,10 @@ class EmployeeList(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return EmployeeWriteSerializer
         return EmployeeSerializer
+
+
+class TodaysMenu(generics.ListAPIView):
+    serializer_class = MenuSerializer
+
+    def get_queryset(self):
+        return Menu.objects.filter(date=timezone.now().date())
