@@ -2,8 +2,8 @@ import xlrd
 from django.utils import timezone
 from rest_framework import generics, permissions, views, response, status
 
-from .models import Restaurant, Menu
-from .serializers import RestaurantSerializer
+from .models import Restaurant, Menu, Employee
+from .serializers import RestaurantSerializer, EmployeeSerializer, EmployeeWriteSerializer
 
 xlrd.xlsx.ensure_elementtree_imported(False, None)
 xlrd.xlsx.Element_has_iter = True
@@ -51,3 +51,17 @@ class UploadMenu(views.APIView):
             return response.Response({'total_restaurant': total_restaurant, 'total_menu': total_menu}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return response.Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmployeeList(generics.ListCreateAPIView):
+    """
+    GET: API endpoint to get list of Employee
+    POST: API endpoint to create Employee
+    """
+    queryset = Employee.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return EmployeeWriteSerializer
+        return EmployeeSerializer
