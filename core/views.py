@@ -2,8 +2,8 @@ import xlrd
 from django.utils import timezone
 from rest_framework import generics, permissions, views, response, status
 
-from .models import Restaurant, Menu, Employee
-from .serializers import RestaurantSerializer, EmployeeSerializer, EmployeeWriteSerializer, MenuSerializer
+from .models import Restaurant, Menu, Employee, Vote
+from .serializers import RestaurantSerializer, EmployeeSerializer, EmployeeWriteSerializer, MenuSerializer, VoteSerializer
 
 xlrd.xlsx.ensure_elementtree_imported(False, None)
 xlrd.xlsx.Element_has_iter = True
@@ -72,3 +72,20 @@ class TodaysMenu(generics.ListAPIView):
 
     def get_queryset(self):
         return Menu.objects.filter(date=timezone.now().date())
+
+
+class MenuVotting(generics.CreateAPIView):
+    queryset = Vote.objects.all()
+    serializer_class = VoteSerializer
+
+    def post(self, request, menu_id, *args, **kwargs):
+        employee = Employee.objects.get(user=self.request.user)
+        menu = Menu.objects.get(pk=menu_id)
+        
+        serializer = VoteSerializer(data={'employee':employee.id, 'menu':menu.id})
+        if serializer.is_valid(raise_exception=True):
+            menu.votes += 1
+            menu.save(update_fields=['votes'])
+            serializer.save()
+
+        return response.Response(serializer.data, status=status.HTTP_200_OK)

@@ -3,7 +3,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from .models import Restaurant, Employee, Menu
+from .models import Restaurant, Employee, Menu, Vote
 
 
 class UserBasicSerializer(serializers.ModelSerializer):
@@ -78,3 +78,20 @@ class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
         exclude = ('votes', )
+
+
+class VoteSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Vote
+        fields = '__all__'
+
+    def validate(self, attrs):
+        """
+        Validation so that employees can vote for the same menu only once.
+        """
+        votes = Vote.objects.filter(menu=attrs['menu'], employee=attrs['employee'])
+        
+        if votes.exists():
+            raise serializers.ValidationError("You already voted for the menu")
+        return attrs
