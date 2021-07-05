@@ -76,3 +76,22 @@ class MyLunchAPITEST(MyLunchTestCase):
             get_api_url('restaurants/upload-todays-menu'), payload, format="multipart")
         
         self.assertCreated(response)
+
+    def test_get_employee_list(self):
+        response = self.client.get(get_api_url('employees'))
+        self.assertSuccess(response)
+
+    def test_create_employee(self):
+        data = {
+            'user':{
+                'first_name': 'Firstname',
+                'last_name': 'Lastname',
+                'username':'testemployee',
+                'email': 'testemployee@gmail.com',
+                'password': 'secrete',
+                },
+            'phone': '01731736326',
+            'designation':'Accountant'
+            }
+        response = self.client.post(get_api_url('employees'), data, format='json')
+        self.assertCreated(response)
