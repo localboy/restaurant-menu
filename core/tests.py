@@ -1,4 +1,7 @@
+import os
 from django.contrib.auth.models import User
+from django.core.files import File
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
@@ -6,6 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Employee, Restaurant, Menu
+from mylunch.settings import BASE_DIR
 
 
 def get_api_url(url):
@@ -47,7 +51,12 @@ class MyLunchAPITEST(MyLunchTestCase):
         self.client.login(username='testuser', password='secret')
 
         self.restaurant = Restaurant.objects.create(name='test restaurant')
-        self.menu1 = Menu.objects.create(restaurant=self.restaurant, name='test menu', description='Menu description', date=timezone.now().date())
+        self.menu1 = Menu.objects.create(
+            restaurant=self.restaurant, 
+            name='test menu', 
+            description='Menu description', 
+            date=timezone.now().date()
+        )
 
     def test_create_restaurant(self):
         response = self.client.post(get_api_url('restaurants'), {'name':'Test Restaurant'})
@@ -56,3 +65,14 @@ class MyLunchAPITEST(MyLunchTestCase):
     def test_get_restaurants_list(self):
         response = self.client.get(get_api_url('restaurants'))
         self.assertSuccess(response)
+
+    def test_upload_menu(self):
+        menu_file = os.path.join(BASE_DIR, 'menu-list.xlsx')
+        data = File(open(menu_file, 'rb'))
+
+        file = SimpleUploadedFile(menu_file, data.read(), content_type='multipart/form-data')
+        payload = {"file": file}
+        response = self.client.post(
+            get_api_url('restaurants/upload-todays-menu'), payload, format="multipart")
+        
+        self.assertCreated(response)
