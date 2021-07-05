@@ -1,3 +1,5 @@
+from core.serializers import MenuSerializer
+from datetime import date, time
 import os
 from django.contrib.auth.models import User
 from django.core.files import File
@@ -5,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
-from rest_framework import status
+from rest_framework import response, status
 from rest_framework.test import APIClient
 
 from core.models import Employee, Restaurant, Menu
@@ -58,6 +60,10 @@ class MyLunchAPITEST(MyLunchTestCase):
             date=timezone.now().date()
         )
 
+        self.current_date = timezone.now().date()
+        self.yesterday = self.current_date - timezone.timedelta(days=1)
+        self.the_day_before_yesterday = self.current_date - timezone.timedelta(days=2)
+
     def test_create_restaurant(self):
         response = self.client.post(get_api_url('restaurants'), {'name':'Test Restaurant'})
         self.assertCreated(response)
@@ -95,3 +101,21 @@ class MyLunchAPITEST(MyLunchTestCase):
             }
         response = self.client.post(get_api_url('employees'), data, format='json')
         self.assertCreated(response)
+
+    def test_todays_menu(self):
+        restaurant = Restaurant.objects.create(name='Restaurant 2')
+        menu = Menu.objects.create(
+            restaurant=restaurant, 
+            name="Menu 2", 
+            description='Menu description', 
+            date=self.yesterday
+            )
+        another_nemu = Menu.objects.create(
+            restaurant=restaurant, 
+            name="Another Menu", 
+            description='Menu description', 
+            date=self.current_date
+            )
+        response = self.client.get(get_api_url('restaurants/todays-menu'))
+        self.assertSuccess(response)
+        self.assertEqual(len(response.data), 2)
