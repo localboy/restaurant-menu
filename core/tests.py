@@ -134,3 +134,62 @@ class MyLunchAPITEST(MyLunchTestCase):
         again_votting = self.client.post(get_api_url('restaurants/{}/vote'.format(menu_id)))
         self.assertBadRequest(again_votting)
 
+    def test_winner(self):
+        restaurant_1 = Restaurant.objects.create(name='Restaurant 1')
+        restaurant_2 = Restaurant.objects.create(name='Restaurant 2')
+
+        # Make restaurant_1 wiiner for last 2 consecutive working days
+        menu_1 = Menu.objects.create(
+            restaurant=restaurant_1, 
+            name="Menu 1", 
+            description='Menu description', 
+            date=self.the_day_before_yesterday,
+            votes=5 # Making this restaurant winner
+            )
+        nemu_2 = Menu.objects.create(
+            restaurant=restaurant_2, 
+            name="Menu 2", 
+            description='Menu description', 
+            date=self.the_day_before_yesterday,
+            votes=3
+            )
+        menu_3 = Menu.objects.create(
+            restaurant=restaurant_1, 
+            name="Menu 3", 
+            description='Menu description', 
+            date=self.yesterday,
+            votes=5 # Making this restaurant winner
+            )
+        nemu_4 = Menu.objects.create(
+            restaurant=restaurant_2, 
+            name="Menu 4", 
+            description='Menu description', 
+            date=self.yesterday,
+            votes=3
+            )
+
+        # In Current date restaurant_1 and self.restaurant have same vote
+        menu_5 = Menu.objects.create(
+            restaurant=restaurant_1, 
+            name="Menu 5", 
+            description='Menu description', 
+            date=self.current_date,
+            votes=5
+            )
+        nemu_6 = Menu.objects.create(
+            restaurant=restaurant_2, 
+            name="Menu 6", 
+            description='Menu description', 
+            date=self.current_date,
+            votes=3
+            )
+        menu_7 = Menu.objects.create(
+            restaurant=self.restaurant, 
+            name="Menu 7", 
+            description='Menu description', 
+            date=self.current_date,
+            votes=5
+            )
+        response = self.client.get(get_api_url('restaurants/winner'))
+        self.assertSuccess(response)
+        self.assertEqual(response.data['restaurant']['id'], self.restaurant.id)
