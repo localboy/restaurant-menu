@@ -89,3 +89,34 @@ class MenuVotting(generics.CreateAPIView):
             serializer.save()
 
         return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class Winner(views.APIView):
+    """
+    GET: API endpoint to get today's wiiner
+    """
+    def get(self, request, format=None):
+        current_date = timezone.now().date()
+        yesterday = current_date - timezone.timedelta(days=1)
+        the_day_before_yesterday = current_date - timezone.timedelta(days=2)
+
+        yesterday_winner = Menu.objects.filter(
+            date=yesterday).order_by('-votes').first()
+
+        the_day_before_yesterday_winner = Menu.objects.filter(
+            date=the_day_before_yesterday).order_by('-votes').first()
+
+        todays_menu = Menu.objects.filter(date=timezone.now().date())
+
+        # Checking if the last two days' winners are the same restaurant.
+        # If they are the same then the restaurant will be excluded from today
+        if (yesterday_winner and the_day_before_yesterday_winner and 
+            (yesterday_winner.restaurant.id == the_day_before_yesterday_winner.restaurant.id)):
+            
+            todays_menu = todays_menu.exclude(
+                restaurant__id=yesterday_winner.restaurant.id)
+
+        winner = todays_menu.order_by('-votes').first()
+        serializer = MenuSerializer(winner)
+
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
