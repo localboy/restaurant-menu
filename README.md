@@ -20,3 +20,5 @@ The project is used [Djoser](https://github.com/sunscrapers/djoser) for Authenti
 1. To create user go to [http://127.0.0.1:8000/api/auth/users/](http://127.0.0.1:8000/api/auth/users/)
 2. To get token [http://127.0.0.1:8000/api/auth/token/login/](http://127.0.0.1:8000/api/auth/token/login/)
 
+# API documentation
+Go to [http://127.0.0.1:8000/api-doc/](http://127.0.0.1:8000/api-doc/) for API documentation
