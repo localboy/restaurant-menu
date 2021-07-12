@@ -8,7 +8,7 @@ Docker, Python. Django, Django Rest Framework, PostgreSQL
 To launch the project you have to install [Docker](https://docs.docker.com/engine/install/) and [Make](https://www.gnu.org/software/make/) in your PC. Then :
 
 1. Clone the project by `git clone https://github.com/localboy/restaurant-menu.git`
-2. Go to project directory `cd restaurant-menu` and create a `logs` directory by `mkdir logs`
+2. Go to project directory `cd restaurant-menu`.
 3. Run `make build`. It will install required packages.
 4. Run `make test` to run the tests of the project.
 5. Run `make start`. It will start the container in background.
