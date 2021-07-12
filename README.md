@@ -9,11 +9,12 @@ To launch the project you have to install [Docker](https://docs.docker.com/engin
 
 1. Clone the project by `git clone https://github.com/localboy/restaurant-menu.git`
 2. Go to project directory `cd restaurant-menu`.
-3. Run `make build`. It will install required packages.
-4. Run `make test` to run the tests of the project.
-5. Run `make start`. It will start the container in background.
-6. Run `make superuser` to create super user.
-7. Please read [Makefile](https://github.com/localboy/restaurant-menu/blob/master/Makefile) for more commands.
+3. create a file `.env` from `sample.env` and add database and other information mentioned in the file
+4. Run `make build`. It will install required packages.
+5. Run `make test` to run the tests of the project.
+6. Run `make start`. It will start the container in background.
+7. Run `make superuser` to create super user.
+8. Please read [Makefile](https://github.com/localboy/restaurant-menu/blob/master/Makefile) for more commands.
 
 # Authentication
 The project is used [Djoser](https://github.com/sunscrapers/djoser) for Authentication. Also used Token based authentication. 
