@@ -11,8 +11,8 @@ xlrd.xlsx.Element_has_iter = True
 
 class RestaurantList(generics.ListCreateAPIView):
     """
-    GET : Allow user to get list of restaurants
-    POST : Allow user to create restaurant
+    get : Allow user to get list of restaurants
+    post : Allow user to create restaurant
     """
     queryset =  Restaurant.objects.all()
     serializer_class = RestaurantSerializer
@@ -21,7 +21,7 @@ class RestaurantList(generics.ListCreateAPIView):
 
 class UploadMenu(views.APIView):
     """
-    POST: Allow user to upload todays menu.
+    post: Allow user to upload todays menu.
     A sample excel file is added to the project root directoy.
     """
 
@@ -55,8 +55,8 @@ class UploadMenu(views.APIView):
 
 class EmployeeList(generics.ListCreateAPIView):
     """
-    GET: API endpoint to get list of Employee
-    POST: API endpoint to create Employee
+    get: API endpoint to get list of Employee
+    post: API endpoint to create Employee
     """
     queryset = Employee.objects.all()
     permission_classes = [permissions.IsAuthenticated]
@@ -68,6 +68,9 @@ class EmployeeList(generics.ListCreateAPIView):
 
 
 class TodaysMenu(generics.ListAPIView):
+    """
+    get: Get today's menu list
+    """
     serializer_class = MenuSerializer
 
     def get_queryset(self):
@@ -75,6 +78,9 @@ class TodaysMenu(generics.ListAPIView):
 
 
 class MenuVotting(generics.CreateAPIView):
+    """
+    post: Vote for Menu
+    """
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
 
@@ -93,7 +99,7 @@ class MenuVotting(generics.CreateAPIView):
 
 class Winner(views.APIView):
     """
-    GET: API endpoint to get today's wiiner
+    get: API endpoint to get today's wiiner
     """
     def get(self, request, format=None):
         current_date = timezone.now().date()
