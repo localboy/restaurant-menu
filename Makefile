@@ -34,6 +34,9 @@ clean: stop
 build:
 	@docker-compose build web
 
+flake8:
+	@docker-compose run --rm web flake8
+
 test:
 	@docker-compose run --rm web python ./manage.py test
 
@@ -55,4 +58,4 @@ cli:
 tail:
 	@docker-compose logs -f
 
-.PHONY: start stop status restart clean build test migrations migrate shell cli tail
+.PHONY: start stop status restart clean build flake8 test migrations migrate shell cli tail

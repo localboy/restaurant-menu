@@ -33,3 +33,6 @@ share/python-wheels/
 
 # Static files
 staticfiles/*
+
+# IDE
+.vscode/

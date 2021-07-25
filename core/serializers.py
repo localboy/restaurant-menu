@@ -17,7 +17,7 @@ class UserWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name','username', 'email', 'password')
+        fields = ('first_name', 'last_name', 'username', 'email', 'password')
 
 
 class RestaurantSerializer(serializers.ModelSerializer):
@@ -45,7 +45,8 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         with transaction.atomic():
             try:
-                user = User.objects.get(username=validated_data['user']['username'])
+                user = User.objects.get(
+                    username=validated_data['user']['username'])
                 user.first_name = validated_data['user']['first_name']
                 user.last_name = validated_data['user']['last_name']
                 user.email = validated_data['user']['email']
@@ -53,20 +54,20 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
                 user.save(update_fields=['email', 'password'])
 
                 employee, created = Employee.objects.get_or_create(
-                    user=user, phone=validated_data['phone'], 
+                    user=user, phone=validated_data['phone'],
                     designation=validated_data['designation']
                     )
             except User.DoesNotExist:
                 user = User(
                     username=validated_data['user']['username'],
-                    first_name = validated_data['user']['first_name'],
-                    last_name = validated_data['user']['last_name'],
+                    first_name=validated_data['user']['first_name'],
+                    last_name=validated_data['user']['last_name'],
                     email=validated_data['user']['email'])
                 user.set_password(validated_data['user']['password'])
                 user.save()
                 employee = Employee.objects.create(
-                    user=user, 
-                    phone=validated_data['phone'], 
+                    user=user,
+                    phone=validated_data['phone'],
                     designation=validated_data['designation']
                     )
             return employee
@@ -81,7 +82,7 @@ class MenuSerializer(serializers.ModelSerializer):
 
 
 class VoteSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Vote
         fields = '__all__'
@@ -90,8 +91,9 @@ class VoteSerializer(serializers.ModelSerializer):
         """
         Validation so that employees can vote for the same menu only once.
         """
-        votes = Vote.objects.filter(menu=attrs['menu'], employee=attrs['employee'])
-        
+        votes = Vote.objects.filter(
+            menu=attrs['menu'], employee=attrs['employee'])
+
         if votes.exists():
             raise serializers.ValidationError("You already voted for the menu")
         return attrs

@@ -3,7 +3,8 @@ from django.utils import timezone
 from rest_framework import generics, permissions, views, response, status
 
 from .models import Restaurant, Menu, Employee, Vote
-from .serializers import RestaurantSerializer, EmployeeSerializer, EmployeeWriteSerializer, MenuSerializer, VoteSerializer
+from .serializers import RestaurantSerializer, EmployeeSerializer, \
+    EmployeeWriteSerializer, MenuSerializer, VoteSerializer
 
 xlrd.xlsx.ensure_elementtree_imported(False, None)
 xlrd.xlsx.Element_has_iter = True
@@ -14,7 +15,7 @@ class RestaurantList(generics.ListCreateAPIView):
     get : Allow user to get list of restaurants
     post : Allow user to create restaurant
     """
-    queryset =  Restaurant.objects.all()
+    queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -32,25 +33,31 @@ class UploadMenu(views.APIView):
             sheet = wb.sheet_by_index(0)
             total_restaurant = 0
             total_menu = 0
-            
+
             for i in range(sheet.nrows):
                 restaurant_name = sheet.row_values(i)[0].strip()
                 menu_name = sheet.row_values(i)[1].strip()
                 menu_desc = sheet.row_values(i)[2].strip()
-                restaurant, created = Restaurant.objects.get_or_create(name=restaurant_name)
+                restaurant, created = Restaurant.objects.get_or_create(
+                    name=restaurant_name)
                 if created:
                     total_restaurant += 1
-                menu = Menu.objects.create(
-                    restaurant=restaurant, 
-                    name = menu_name, 
-                    description=menu_desc, 
+                Menu.objects.create(
+                    restaurant=restaurant,
+                    name=menu_name,
+                    description=menu_desc,
                     date=timezone.now().date()
                     )
                 total_menu += 1
 
-            return response.Response({'total_restaurant': total_restaurant, 'total_menu': total_menu}, status=status.HTTP_201_CREATED)
+            return response.Response({
+                'total_restaurant': total_restaurant,
+                'total_menu': total_menu},
+                status=status.HTTP_201_CREATED)
         except Exception as e:
-            return response.Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                {'message': str(e)},
+                status=status.HTTP_400_BAD_REQUEST)
 
 
 class EmployeeList(generics.ListCreateAPIView):
@@ -87,8 +94,10 @@ class MenuVotting(generics.CreateAPIView):
     def post(self, request, menu_id, *args, **kwargs):
         employee = Employee.objects.get(user=self.request.user)
         menu = Menu.objects.get(pk=menu_id)
-        
-        serializer = VoteSerializer(data={'employee':employee.id, 'menu':menu.id})
+
+        serializer = VoteSerializer(data={
+            'employee': employee.id, 'menu': menu.id
+            })
         if serializer.is_valid(raise_exception=True):
             menu.votes += 1
             menu.save(update_fields=['votes'])
@@ -116,9 +125,10 @@ class Winner(views.APIView):
 
         # Checking if the last two days' winners are the same restaurant.
         # If they are the same then the restaurant will be excluded from today
-        if (yesterday_winner and the_day_before_yesterday_winner and 
-            (yesterday_winner.restaurant.id == the_day_before_yesterday_winner.restaurant.id)):
-            
+        if (yesterday_winner and the_day_before_yesterday_winner and
+                (yesterday_winner.restaurant.id ==
+                    the_day_before_yesterday_winner.restaurant.id)):
+
             todays_menu = todays_menu.exclude(
                 restaurant__id=yesterday_winner.restaurant.id)
 
